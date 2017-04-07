@@ -1,0 +1,237 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="https://github.com/brycebaril/node-stream-spigot#readme">stream-spigot (v3.0.6)</a>
+</h1>
+<h4>A readable stream generator, useful for testing or converting simple functions into Readable streams.</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.stream-spigot">module stream-spigot</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.stream-spigot.array">
+            function <span class="apidocSignatureSpan">stream-spigot.</span>array
+            <span class="apidocSignatureSpan">(options, array)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.stream-spigot.ctor">
+            function <span class="apidocSignatureSpan">stream-spigot.</span>ctor
+            <span class="apidocSignatureSpan">(options, _read)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.stream-spigot.sync">
+            function <span class="apidocSignatureSpan">stream-spigot.</span>sync
+            <span class="apidocSignatureSpan">(options, fn)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.stream-spigot" id="apidoc.module.stream-spigot">module stream-spigot</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.stream-spigot.array" id="apidoc.element.stream-spigot.array">
+        function <span class="apidocSignatureSpan">stream-spigot.</span>array
+        <span class="apidocSignatureSpan">(options, array)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function array(options, array) {
+  if (Array.isArray(options)) {
+    array = options
+    options = {}
+  }
+
+  return make(options, _shifter(array))
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+
+
+A generator for (streams2) Readable streams, useful for testing or converting simple lazy functions into Readable streams, or just
+ creating Readable streams without all the boilerplate.
+
+```javascript
+var spigot = require("stream-spigot")
+
+spigot.<span class="apidocCodeKeywordSpan">array</span>(["ABCDEFG"]).pipe(process.stdout)
+// ABCDEFG
+
+spigot.array(["ABC", "DEF", "G"]).pipe(process.stdout)
+// same as: (short form)
+spigot(["ABC", "DEF", "G"]).pipe(process.stdout)
+// ABCDEFG
+...</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.stream-spigot.ctor" id="apidoc.element.stream-spigot.ctor">
+        function <span class="apidocSignatureSpan">stream-spigot.</span>ctor
+        <span class="apidocSignatureSpan">(options, _read)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function ctor(options, _read) {
+  if (_read == null) {
+    _read    = options
+    options   = {}
+  }
+
+  if (Array.isArray(_read))
+    _read = _shifter(_read)
+
+  if (typeof _read != "function")
+    throw new Error("You must implement an _read function for Spigot")
+
+  function Spigot (override) {
+    if (!(this instanceof Spigot))
+      return new Spigot(override)
+
+    this.options = xtend(options, override)
+    Readable.call(this, this.options)
+  }
+
+  inherits(Spigot, Readable)
+
+  Spigot.prototype._read = _read
+
+  return Spigot
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+Create a Readable stream instance with the specified _read method. Your _read method should follow the normal [stream.Readable _read
+](http://nodejs.org/api/stream.html#stream_readable_read_size_1) syntax. (I.e. it should call `this.push(chunk)`)
+
+spigot([options, ], array)
+---
+
+Create a Readable stream instance that will emit each member of the specified array until it is consumed. Creates a copy of the
+given array and consumes that -- if this will cause memory issues, consider implementing your own _read function to consume your
+ array.
+
+var Spigot = spigot.<span class="apidocCodeKeywordSpan">ctor</span>([options,], _read)
+---
+
+Same as the above except provides a constructor for your Readable class. You can then create instances by using either `var source
+ = new Spigot()` or `var source = Spigot()`.
+
+var Spigot = spigot.ctor([options,], array)
+---
+...</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.stream-spigot.sync" id="apidoc.element.stream-spigot.sync">
+        function <span class="apidocSignatureSpan">stream-spigot.</span>sync
+        <span class="apidocSignatureSpan">(options, fn)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function sync(options, fn) {
+  if (typeof options == "function") {
+    fn = options
+    options = {}
+  }
+  var toAsync = function toAsync() {
+    var self = this
+    setImmediate(function later() {
+      var val = fn()
+      if (val === undefined) {
+        val = null
+      }
+      self.push(val)
+    })
+  }
+  return make(options, toAsync)
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+var count = 0
+function gen() {
+  if (count++ &lt; 5) {
+    return {val: count}
+  }
+}
+
+spigot.<span class="apidocCodeKeywordSpan">sync</span>({objectMode: true}, gen).pipe(...)
+/*
+{val: 1}
+{val: 2}
+{val: 3}
+{val: 4}
+{val: 5}
+*/
+...</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
